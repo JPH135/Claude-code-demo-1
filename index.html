@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Numbers Challenge!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- SCREEN 1: Welcome -->
+    <section id="welcome-screen" class="screen active">
+        <div class="checkered-bg"></div>
+        <div class="welcome-content">
+            <div class="logo-container">
+                <h1 class="game-title">
+                    <span class="title-line1">COUNTDOWN</span>
+                    <span class="title-line2">NUMBERS</span>
+                    <span class="title-line3">CHALLENGE!</span>
+                </h1>
+                <div class="racing-flags">
+                    <span class="flag flag-left">🏁</span>
+                    <span class="flag flag-right">🏁</span>
+                </div>
+            </div>
+            <div class="subtitle">Race to the Right Number!</div>
+            <button id="start-btn" class="big-button bounce" onclick="showScreen('setup-screen')">
+                🏎️ START GAME 🏎️
+            </button>
+            <div class="car-parade">
+                <span class="parade-car">🏎️</span>
+                <span class="parade-car" style="animation-delay: 0.5s">🏎️</span>
+                <span class="parade-car" style="animation-delay: 1s">🏎️</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 2: Player Setup -->
+    <section id="setup-screen" class="screen">
+        <div class="screen-inner">
+            <h2 class="screen-title">👥 Who's Racing?</h2>
+            <div class="setup-form">
+                <div class="add-player-row">
+                    <input type="text" id="player-name-input" placeholder="Enter name..." maxlength="15" class="name-input">
+                    <select id="player-age-input" class="age-select">
+                        <option value="" disabled selected>Age</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </select>
+                    <button id="add-player-btn" class="add-btn" onclick="addPlayer()">+ Add</button>
+                </div>
+                <div id="player-list" class="player-list"></div>
+                <div id="setup-error" class="error-msg"></div>
+                <button id="start-race-btn" class="big-button" onclick="startGame()" disabled>
+                    🏁 START THE RACE! 🏁
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 3: Turn Announcement -->
+    <section id="turn-screen" class="screen">
+        <div class="screen-inner turn-announce">
+            <div id="turn-round-info" class="round-info"></div>
+            <div id="turn-player-name" class="turn-player-name"></div>
+            <div id="turn-player-avatar" class="turn-avatar"></div>
+            <div id="countdown-321" class="countdown-321">
+                <span id="countdown-text"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 4: Game Board -->
+    <section id="game-screen" class="screen">
+        <div class="game-layout">
+            <!-- Top Bar -->
+            <div class="game-top-bar">
+                <div class="player-info-bar">
+                    <span id="current-player-label" class="current-player-label"></span>
+                    <span id="round-label" class="round-label"></span>
+                </div>
+                <div class="timer-display">
+                    <span id="timer-text" class="timer-text">60</span>
+                    <span class="timer-unit">s</span>
+                </div>
+            </div>
+
+            <!-- Target Number -->
+            <div class="target-container">
+                <div class="target-label">TARGET</div>
+                <div id="target-number" class="target-number">142</div>
+            </div>
+
+            <!-- F1 Race Track Timer -->
+            <div class="track-container">
+                <svg id="race-track" viewBox="0 0 400 160" class="race-track-svg">
+                    <!-- Track outline -->
+                    <path id="track-path" d="M 80,130 A 50,50 0 0 1 80,30 L 320,30 A 50,50 0 0 1 320,130 Z"
+                          fill="none" stroke="#444" stroke-width="28" stroke-linejoin="round"/>
+                    <!-- Track surface -->
+                    <path d="M 80,130 A 50,50 0 0 1 80,30 L 320,30 A 50,50 0 0 1 320,130 Z"
+                          fill="none" stroke="#666" stroke-width="24" stroke-linejoin="round"/>
+                    <!-- Track center line (dashed) -->
+                    <path d="M 80,130 A 50,50 0 0 1 80,30 L 320,30 A 50,50 0 0 1 320,130 Z"
+                          fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="8,8" stroke-linejoin="round" opacity="0.4"/>
+                    <!-- Start/finish line -->
+                    <rect x="195" y="118" width="10" height="24" fill="white" opacity="0.8"/>
+                    <rect x="195" y="118" width="5" height="6" fill="black"/>
+                    <rect x="200" y="124" width="5" height="6" fill="black"/>
+                    <rect x="195" y="130" width="5" height="6" fill="black"/>
+                    <rect x="200" y="136" width="5" height="6" fill="black"/>
+                    <!-- Grandstand decorations -->
+                    <rect x="120" y="60" width="160" height="40" rx="5" fill="#2a2a5a" opacity="0.3"/>
+                    <text x="200" y="85" text-anchor="middle" fill="#fff" font-size="12" font-family="Fredoka One" opacity="0.5">COUNTDOWN GP</text>
+                    <!-- F1 Car -->
+                    <g id="f1-car">
+                        <text font-size="22" text-anchor="middle" dominant-baseline="central">🏎️</text>
+                    </g>
+                </svg>
+                <div id="track-status" class="track-status">🟢 GO!</div>
+            </div>
+
+            <!-- Number Cards -->
+            <div class="cards-section">
+                <div class="section-label">YOUR NUMBERS</div>
+                <div id="number-cards" class="number-cards"></div>
+            </div>
+
+            <!-- Operators -->
+            <div class="operators-section">
+                <div class="section-label">OPERATORS</div>
+                <div id="operator-buttons" class="operator-buttons"></div>
+            </div>
+
+            <!-- Expression Builder -->
+            <div class="expression-section">
+                <div class="section-label">YOUR ANSWER</div>
+                <div id="expression-area" class="expression-area">
+                    <span class="placeholder-text">Click cards and operators to build your answer!</span>
+                </div>
+                <div id="expression-result" class="expression-result"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="clear-btn" class="action-btn clear-btn" onclick="clearExpression()">🗑️ Clear</button>
+                <button id="undo-btn" class="action-btn undo-btn" onclick="undoLast()">↩️ Undo</button>
+                <button id="submit-btn" class="action-btn submit-btn" onclick="submitAnswer()">✅ Submit!</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 5: Round Result -->
+    <section id="result-screen" class="screen">
+        <div class="screen-inner">
+            <div id="result-feedback" class="result-feedback"></div>
+            <div id="result-details" class="result-details"></div>
+            <div id="scoreboard" class="scoreboard"></div>
+            <button id="next-turn-btn" class="big-button" onclick="nextTurn()">
+                ➡️ Next Turn!
+            </button>
+        </div>
+    </section>
+
+    <!-- SCREEN 6: Final Winner -->
+    <section id="winner-screen" class="screen">
+        <div class="screen-inner">
+            <h2 class="winner-title">🏆 RACE FINISHED! 🏆</h2>
+            <div id="final-scoreboard" class="scoreboard final-scoreboard"></div>
+            <div id="winner-announcement" class="winner-announcement"></div>
+            <button class="big-button" onclick="resetGame()">🔄 Race Again!</button>
+        </div>
+    </section>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
