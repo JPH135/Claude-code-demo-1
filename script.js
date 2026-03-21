@@ -1,7 +1,7 @@
 // ===== GAME STATE =====
 const AVATARS = ['🏎️', '🚀', '⭐', '🎯'];
 const AVATAR_COLORS = ['#45caff', '#ff6b9d', '#6bff8e', '#ffd93d'];
-const ROUNDS_PER_PLAYER = 3;
+const ROUNDS_PER_PLAYER = 5;
 
 const state = {
     players: [],
@@ -44,7 +44,7 @@ function getDifficulty(age) {
         return {
             cardCount: 6,
             numberPool: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 50, 75, 100],
-            targetMin: 100,
+            targetMin: 200,
             targetMax: 999,
             operators: ['+', '-', '×', '÷', '(', ')'],
         };

@@ -401,8 +401,7 @@ body {
     padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-height: 100vh;
+    gap: 8px;
 }
 
 .game-top-bar {
@@ -457,7 +456,7 @@ body {
 /* ===== TARGET NUMBER ===== */
 .target-container {
     text-align: center;
-    padding: 15px;
+    padding: 8px;
     background: linear-gradient(135deg, rgba(255,107,157,0.15), rgba(69,202,255,0.15));
     border: 3px solid var(--accent-yellow);
     border-radius: 20px;
@@ -490,13 +489,14 @@ body {
     position: relative;
     background: rgba(0,0,0,0.3);
     border-radius: 20px;
-    padding: 10px;
+    padding: 5px;
     overflow: hidden;
 }
 
 .race-track-svg {
     width: 100%;
     height: auto;
+    max-height: 120px;
     display: block;
 }
 
