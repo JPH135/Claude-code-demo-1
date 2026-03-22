@@ -1,0 +1,462 @@
+[
+  {
+    "name": "Monzo",
+    "description": "Digital-first bank offering current accounts, savings, and financial management tools via mobile app.",
+    "website": "https://monzo.com",
+    "linkedin_url": "https://www.linkedin.com/company/monzo-bank/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Digital Banking",
+    "stage": "Series H",
+    "founded_year": 2015,
+    "total_raised_usd": 1200000000,
+    "employee_count": 3200,
+    "crunchbase_url": "https://www.crunchbase.com/organization/monzo",
+    "funding_rounds": [
+      {
+        "round_type": "Series H",
+        "announced_date": "2024-03-01",
+        "amount_usd": 430000000,
+        "lead_investors": ["Capital G"],
+        "all_investors": ["Capital G", "Silver Lake", "GIC"]
+      }
+    ]
+  },
+  {
+    "name": "Revolut",
+    "description": "Global financial super-app offering banking, crypto, trading, and international payments.",
+    "website": "https://revolut.com",
+    "linkedin_url": "https://www.linkedin.com/company/revolut/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Digital Banking",
+    "stage": "Series E",
+    "founded_year": 2015,
+    "total_raised_usd": 1700000000,
+    "employee_count": 8000,
+    "crunchbase_url": "https://www.crunchbase.com/organization/revolut",
+    "funding_rounds": [
+      {
+        "round_type": "Series E",
+        "announced_date": "2023-08-01",
+        "amount_usd": 800000000,
+        "lead_investors": ["SoftBank Vision Fund"],
+        "all_investors": ["SoftBank Vision Fund", "Tiger Global"]
+      }
+    ]
+  },
+  {
+    "name": "Starling Bank",
+    "description": "Mobile-first challenger bank providing personal, business, and joint bank accounts in the UK.",
+    "website": "https://starlingbank.com",
+    "linkedin_url": "https://www.linkedin.com/company/starling-bank/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Digital Banking",
+    "stage": "Series D",
+    "founded_year": 2014,
+    "total_raised_usd": 750000000,
+    "employee_count": 3500,
+    "crunchbase_url": "https://www.crunchbase.com/organization/starling-2",
+    "funding_rounds": [
+      {
+        "round_type": "Series D",
+        "announced_date": "2022-04-01",
+        "amount_usd": 130000000,
+        "lead_investors": ["Goldman Sachs"],
+        "all_investors": ["Goldman Sachs", "Fidelity"]
+      }
+    ]
+  },
+  {
+    "name": "Checkout.com",
+    "description": "Cloud-based payments platform enabling businesses to accept payments online, in-app, and in-person.",
+    "website": "https://checkout.com",
+    "linkedin_url": "https://www.linkedin.com/company/checkout-com/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Payments",
+    "stage": "Series D",
+    "founded_year": 2012,
+    "total_raised_usd": 1800000000,
+    "employee_count": 1900,
+    "crunchbase_url": "https://www.crunchbase.com/organization/checkout-com",
+    "funding_rounds": [
+      {
+        "round_type": "Series D",
+        "announced_date": "2022-01-01",
+        "amount_usd": 1000000000,
+        "lead_investors": ["Tiger Global"],
+        "all_investors": ["Tiger Global", "Insight Partners", "GIC"]
+      }
+    ]
+  },
+  {
+    "name": "Wise",
+    "description": "International money transfer service offering low-cost currency exchange and multi-currency accounts.",
+    "website": "https://wise.com",
+    "linkedin_url": "https://www.linkedin.com/company/wiseaccount/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Payments",
+    "stage": "Public",
+    "founded_year": 2011,
+    "total_raised_usd": 1300000000,
+    "employee_count": 5500,
+    "crunchbase_url": "https://www.crunchbase.com/organization/transferwise",
+    "funding_rounds": [
+      {
+        "round_type": "IPO",
+        "announced_date": "2021-07-07",
+        "amount_usd": 0,
+        "lead_investors": [],
+        "all_investors": []
+      }
+    ]
+  },
+  {
+    "name": "OakNorth",
+    "description": "AI-powered lending platform providing bespoke debt finance to fast-growing UK businesses.",
+    "website": "https://oaknorth.com",
+    "linkedin_url": "https://www.linkedin.com/company/oaknorth/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Lending",
+    "stage": "Series E",
+    "founded_year": 2015,
+    "total_raised_usd": 1000000000,
+    "employee_count": 1100,
+    "crunchbase_url": "https://www.crunchbase.com/organization/oaknorth",
+    "funding_rounds": [
+      {
+        "round_type": "Series E",
+        "announced_date": "2023-01-15",
+        "amount_usd": 440000000,
+        "lead_investors": ["SoftBank Vision Fund"],
+        "all_investors": ["SoftBank Vision Fund", "Clermont Group"]
+      }
+    ]
+  },
+  {
+    "name": "GoCardless",
+    "description": "Global bank payment network for collecting both recurring and one-off payments.",
+    "website": "https://gocardless.com",
+    "linkedin_url": "https://www.linkedin.com/company/gocardless/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Payments",
+    "stage": "Series G",
+    "founded_year": 2011,
+    "total_raised_usd": 530000000,
+    "employee_count": 900,
+    "crunchbase_url": "https://www.crunchbase.com/organization/gocardless",
+    "funding_rounds": [
+      {
+        "round_type": "Series G",
+        "announced_date": "2022-02-01",
+        "amount_usd": 312000000,
+        "lead_investors": ["Permira"],
+        "all_investors": ["Permira", "BlackRock"]
+      }
+    ]
+  },
+  {
+    "name": "Zopa",
+    "description": "Digital bank and peer-to-peer lending pioneer offering savings accounts, credit cards, and personal loans.",
+    "website": "https://zopa.com",
+    "linkedin_url": "https://www.linkedin.com/company/zopa/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Digital Banking",
+    "stage": "Series E",
+    "founded_year": 2005,
+    "total_raised_usd": 780000000,
+    "employee_count": 700,
+    "crunchbase_url": "https://www.crunchbase.com/organization/zopa",
+    "funding_rounds": [
+      {
+        "round_type": "Series E",
+        "announced_date": "2023-06-01",
+        "amount_usd": 93000000,
+        "lead_investors": ["IAG Silverstripe"],
+        "all_investors": ["IAG Silverstripe", "Davidson Kempner"]
+      }
+    ]
+  },
+  {
+    "name": "Thought Machine",
+    "description": "Cloud-native core banking technology provider powering next-generation banks worldwide.",
+    "website": "https://thoughtmachine.net",
+    "linkedin_url": "https://www.linkedin.com/company/thought-machine/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Banking Infrastructure",
+    "stage": "Series D",
+    "founded_year": 2014,
+    "total_raised_usd": 560000000,
+    "employee_count": 800,
+    "crunchbase_url": "https://www.crunchbase.com/organization/thought-machine",
+    "funding_rounds": [
+      {
+        "round_type": "Series D",
+        "announced_date": "2023-05-01",
+        "amount_usd": 160000000,
+        "lead_investors": ["Temasek"],
+        "all_investors": ["Temasek", "Intesa Sanpaolo", "Morgan Stanley"]
+      }
+    ]
+  },
+  {
+    "name": "Funding Circle",
+    "description": "SME lending platform connecting small businesses with investors for affordable loans.",
+    "website": "https://fundingcircle.com",
+    "linkedin_url": "https://www.linkedin.com/company/funding-circle/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Lending",
+    "stage": "Public",
+    "founded_year": 2010,
+    "total_raised_usd": 750000000,
+    "employee_count": 1200,
+    "crunchbase_url": "https://www.crunchbase.com/organization/funding-circle",
+    "funding_rounds": [
+      {
+        "round_type": "IPO",
+        "announced_date": "2018-10-01",
+        "amount_usd": 300000000,
+        "lead_investors": [],
+        "all_investors": []
+      }
+    ]
+  },
+  {
+    "name": "ClearBank",
+    "description": "UK clearing bank providing real-time clearing and embedded banking services via API.",
+    "website": "https://clear.bank",
+    "linkedin_url": "https://www.linkedin.com/company/clearbank/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Banking Infrastructure",
+    "stage": "Series C",
+    "founded_year": 2015,
+    "total_raised_usd": 280000000,
+    "employee_count": 500,
+    "crunchbase_url": "https://www.crunchbase.com/organization/clearbank",
+    "funding_rounds": [
+      {
+        "round_type": "Series C",
+        "announced_date": "2023-09-01",
+        "amount_usd": 175000000,
+        "lead_investors": ["Apax Digital"],
+        "all_investors": ["Apax Digital", "CFFI"]
+      }
+    ]
+  },
+  {
+    "name": "Modulr",
+    "description": "Payments-as-a-service platform providing API-driven payment solutions for digital businesses.",
+    "website": "https://modulrfinance.com",
+    "linkedin_url": "https://www.linkedin.com/company/modulr/",
+    "hq_city": "Edinburgh",
+    "hq_country": "UK",
+    "category": "Payments",
+    "stage": "Series C",
+    "founded_year": 2015,
+    "total_raised_usd": 190000000,
+    "employee_count": 400,
+    "crunchbase_url": "https://www.crunchbase.com/organization/modulr-finance",
+    "funding_rounds": [
+      {
+        "round_type": "Series C",
+        "announced_date": "2022-09-01",
+        "amount_usd": 108000000,
+        "lead_investors": ["General Atlantic"],
+        "all_investors": ["General Atlantic", "PayPal Ventures"]
+      }
+    ]
+  },
+  {
+    "name": "TrueLayer",
+    "description": "Open banking payments network enabling instant bank payments and financial data access via API.",
+    "website": "https://truelayer.com",
+    "linkedin_url": "https://www.linkedin.com/company/truelayer/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Open Banking",
+    "stage": "Series E",
+    "founded_year": 2016,
+    "total_raised_usd": 270000000,
+    "employee_count": 500,
+    "crunchbase_url": "https://www.crunchbase.com/organization/truelayer",
+    "funding_rounds": [
+      {
+        "round_type": "Series E",
+        "announced_date": "2022-09-01",
+        "amount_usd": 130000000,
+        "lead_investors": ["Tiger Global"],
+        "all_investors": ["Tiger Global", "Stripe", "Tencent"]
+      }
+    ]
+  },
+  {
+    "name": "Yapily",
+    "description": "Open banking infrastructure provider offering API connectivity to banks across Europe.",
+    "website": "https://yapily.com",
+    "linkedin_url": "https://www.linkedin.com/company/yapily/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Open Banking",
+    "stage": "Series B",
+    "founded_year": 2017,
+    "total_raised_usd": 69000000,
+    "employee_count": 200,
+    "crunchbase_url": "https://www.crunchbase.com/organization/yapily",
+    "funding_rounds": [
+      {
+        "round_type": "Series B",
+        "announced_date": "2022-03-01",
+        "amount_usd": 51000000,
+        "lead_investors": ["Sapphire Ventures"],
+        "all_investors": ["Sapphire Ventures", "HV Capital"]
+      }
+    ]
+  },
+  {
+    "name": "Currencycloud",
+    "description": "B2B cross-border payments platform enabling businesses to process international transactions.",
+    "website": "https://currencycloud.com",
+    "linkedin_url": "https://www.linkedin.com/company/currencycloud/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Payments",
+    "stage": "Acquired",
+    "founded_year": 2012,
+    "total_raised_usd": 160000000,
+    "employee_count": 350,
+    "crunchbase_url": "https://www.crunchbase.com/organization/currencycloud",
+    "funding_rounds": [
+      {
+        "round_type": "Acquisition",
+        "announced_date": "2021-11-01",
+        "amount_usd": 963000000,
+        "lead_investors": ["Visa"],
+        "all_investors": ["Visa"]
+      }
+    ]
+  },
+  {
+    "name": "Flagstone",
+    "description": "Cash deposit platform helping individuals and businesses access better savings rates across multiple banks.",
+    "website": "https://flagstoneim.com",
+    "linkedin_url": "https://www.linkedin.com/company/flagstone-group/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Wealth Management",
+    "stage": "Series B",
+    "founded_year": 2013,
+    "total_raised_usd": 45000000,
+    "employee_count": 150,
+    "crunchbase_url": "https://www.crunchbase.com/organization/flagstone-im",
+    "funding_rounds": [
+      {
+        "round_type": "Series B",
+        "announced_date": "2022-06-01",
+        "amount_usd": 28000000,
+        "lead_investors": ["Motive Partners"],
+        "all_investors": ["Motive Partners"]
+      }
+    ]
+  },
+  {
+    "name": "Paddle",
+    "description": "Revenue delivery platform handling payments, tax, and subscriptions for SaaS companies.",
+    "website": "https://paddle.com",
+    "linkedin_url": "https://www.linkedin.com/company/paddle-com/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "Payments",
+    "stage": "Series D",
+    "founded_year": 2012,
+    "total_raised_usd": 293000000,
+    "employee_count": 350,
+    "crunchbase_url": "https://www.crunchbase.com/organization/paddle-com",
+    "funding_rounds": [
+      {
+        "round_type": "Series D",
+        "announced_date": "2022-05-01",
+        "amount_usd": 200000000,
+        "lead_investors": ["KKR"],
+        "all_investors": ["KKR", "FTV Capital", "83North"]
+      }
+    ]
+  },
+  {
+    "name": "Featurespace",
+    "description": "Enterprise AI fraud and financial crime prevention using adaptive behavioral analytics.",
+    "website": "https://featurespace.com",
+    "linkedin_url": "https://www.linkedin.com/company/featurespace/",
+    "hq_city": "Cambridge",
+    "hq_country": "UK",
+    "category": "RegTech",
+    "stage": "Series C",
+    "founded_year": 2008,
+    "total_raised_usd": 108000000,
+    "employee_count": 500,
+    "crunchbase_url": "https://www.crunchbase.com/organization/featurespace",
+    "funding_rounds": [
+      {
+        "round_type": "Series C",
+        "announced_date": "2021-03-01",
+        "amount_usd": 37000000,
+        "lead_investors": ["MissionOG"],
+        "all_investors": ["MissionOG", "IP Group"]
+      }
+    ]
+  },
+  {
+    "name": "Eigen Technologies",
+    "description": "Natural language processing platform for extracting and analysing data from complex financial documents.",
+    "website": "https://eigentech.com",
+    "linkedin_url": "https://www.linkedin.com/company/eigen-technologies/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "RegTech",
+    "stage": "Series B",
+    "founded_year": 2014,
+    "total_raised_usd": 73000000,
+    "employee_count": 200,
+    "crunchbase_url": "https://www.crunchbase.com/organization/eigen-technologies",
+    "funding_rounds": [
+      {
+        "round_type": "Series B",
+        "announced_date": "2021-06-01",
+        "amount_usd": 55000000,
+        "lead_investors": ["Dawn Capital"],
+        "all_investors": ["Dawn Capital", "Goldman Sachs", "Lakestar"]
+      }
+    ]
+  },
+  {
+    "name": "Tractable",
+    "description": "AI-powered visual assessment platform for accident and disaster recovery in insurance.",
+    "website": "https://tractable.ai",
+    "linkedin_url": "https://www.linkedin.com/company/tractable/",
+    "hq_city": "London",
+    "hq_country": "UK",
+    "category": "InsurTech",
+    "stage": "Series E",
+    "founded_year": 2014,
+    "total_raised_usd": 115000000,
+    "employee_count": 350,
+    "crunchbase_url": "https://www.crunchbase.com/organization/tractable",
+    "funding_rounds": [
+      {
+        "round_type": "Series E",
+        "announced_date": "2023-03-01",
+        "amount_usd": 65000000,
+        "lead_investors": ["SoftBank Vision Fund"],
+        "all_investors": ["SoftBank Vision Fund", "Georgian Partners", "Insight Partners"]
+      }
+    ]
+  }
+]
