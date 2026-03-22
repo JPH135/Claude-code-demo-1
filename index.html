@@ -118,9 +118,35 @@
                     <!-- Grandstand decorations -->
                     <rect x="120" y="60" width="160" height="40" rx="5" fill="#2a2a5a" opacity="0.3"/>
                     <text x="200" y="85" text-anchor="middle" fill="#fff" font-size="12" font-family="Fredoka One" opacity="0.5">COUNTDOWN GP</text>
-                    <!-- F1 Car -->
+                    <!-- F1 Car (SVG, facing right, centered at 0,0) -->
                     <g id="f1-car">
-                        <text font-size="22" text-anchor="middle" dominant-baseline="central">🏎️</text>
+                        <!-- Rear wing -->
+                        <rect x="-10" y="-7" width="2.5" height="14" rx="1" fill="#cc0000"/>
+                        <!-- Main body -->
+                        <rect x="-7.5" y="-4" width="16" height="8" rx="3" fill="#ff1801"/>
+                        <!-- Front sidepod -->
+                        <rect x="-2" y="-6.5" width="8" height="4" rx="1.5" fill="#cc0000"/>
+                        <!-- Rear sidepod -->
+                        <rect x="-2" y="2.5" width="8" height="4" rx="1.5" fill="#cc0000"/>
+                        <!-- Cockpit -->
+                        <ellipse cx="1" cy="0" rx="3" ry="3.5" fill="#111"/>
+                        <!-- Driver helmet -->
+                        <ellipse cx="1.5" cy="0" rx="2" ry="1.8" fill="#ffd93d"/>
+                        <!-- Front wing -->
+                        <rect x="8.5" y="-6" width="3" height="12" rx="1" fill="#ff1801"/>
+                        <!-- Nose cone -->
+                        <polygon points="11.5,-1.5 15,0 11.5,1.5" fill="#ff1801"/>
+                        <!-- Front wheels -->
+                        <rect x="4.5" y="-8.5" width="6" height="4" rx="2" fill="#111"/>
+                        <rect x="4.5" y="4.5" width="6" height="4" rx="2" fill="#111"/>
+                        <!-- Rear wheels -->
+                        <rect x="-8.5" y="-8.5" width="6.5" height="4" rx="2" fill="#111"/>
+                        <rect x="-8.5" y="4.5" width="6.5" height="4" rx="2" fill="#111"/>
+                        <!-- Wheel centres -->
+                        <circle cx="7.5" cy="-6.5" r="1.5" fill="#555"/>
+                        <circle cx="7.5" cy="6.5" r="1.5" fill="#555"/>
+                        <circle cx="-5.2" cy="-6.5" r="1.8" fill="#555"/>
+                        <circle cx="-5.2" cy="6.5" r="1.8" fill="#555"/>
                     </g>
                 </svg>
                 <div id="track-status" class="track-status">🟢 GO!</div>

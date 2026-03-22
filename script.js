@@ -18,6 +18,7 @@ const state = {
     timerInterval: null,
     timeLeft: 60,
     timerRunning: false,
+    isFinalRound: false,
     // Audio
     audioCtx: null,
 };
@@ -49,6 +50,16 @@ function getDifficulty(age) {
             operators: ['+', '-', '×', '÷', '(', ')'],
         };
     }
+}
+
+function getFinalRoundDifficulty() {
+    return {
+        cardCount: 7,
+        numberPool: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 50, 75, 100],
+        targetMin: 500,
+        targetMax: 999,
+        operators: ['+', '-', '×', '÷', '(', ')'],
+    };
 }
 
 // ===== SCREEN MANAGEMENT =====
@@ -150,9 +161,16 @@ function startTurn() {
     const player = state.players[state.currentPlayerIndex];
     const roundNum = state.scores[state.currentPlayerIndex].length + 1;
 
+    const isFinal = roundNum === ROUNDS_PER_PLAYER;
+
     // Show turn announcement
     showScreen('turn-screen');
-    document.getElementById('turn-round-info').textContent = `Round ${roundNum} of ${ROUNDS_PER_PLAYER}`;
+    const roundInfoEl = document.getElementById('turn-round-info');
+    if (isFinal) {
+        roundInfoEl.innerHTML = `<span class="final-round-label">🔥 FINAL ROUND! 🔥</span><br><small style="font-size:0.9rem;color:#45caff">2 minutes · up to 20 points!</small>`;
+    } else {
+        roundInfoEl.textContent = `Round ${roundNum} of ${ROUNDS_PER_PLAYER}`;
+    }
     document.getElementById('turn-player-name').textContent = player.name;
     document.getElementById('turn-player-name').style.color = player.color;
     document.getElementById('turn-player-avatar').textContent = player.avatar;
@@ -189,7 +207,9 @@ function startTurn() {
 
 // ===== PUZZLE GENERATION =====
 function setupGameBoard(player) {
-    const diff = getDifficulty(player.age);
+    const roundNum = state.scores[state.currentPlayerIndex].length + 1;
+    state.isFinalRound = (roundNum === ROUNDS_PER_PLAYER);
+    const diff = state.isFinalRound ? getFinalRoundDifficulty() : getDifficulty(player.age);
 
     // Generate number cards
     const cards = [];
@@ -209,8 +229,11 @@ function setupGameBoard(player) {
     // Update UI
     document.getElementById('current-player-label').innerHTML =
         `${player.avatar} <span style="color:${player.color}">${escapeHtml(player.name)}</span>`;
-    document.getElementById('round-label').textContent =
-        `Round ${state.scores[state.currentPlayerIndex].length + 1}/${ROUNDS_PER_PLAYER}`;
+    if (state.isFinalRound) {
+        document.getElementById('round-label').innerHTML = `<span style="color:#ffd93d">🔥 FINAL ROUND</span>`;
+    } else {
+        document.getElementById('round-label').textContent = `Round ${roundNum}/${ROUNDS_PER_PLAYER}`;
+    }
     document.getElementById('target-number').textContent = target;
 
     renderCards(diff);
@@ -419,7 +442,9 @@ function renderExpression() {
 
 // ===== TIMER & F1 CAR =====
 function startTimer() {
-    state.timeLeft = 60;
+    const totalSeconds = state.isFinalRound ? 120 : 60;
+    const duration = totalSeconds * 1000;
+    state.timeLeft = totalSeconds;
     state.timerRunning = true;
 
     const timerText = document.getElementById('timer-text');
@@ -430,15 +455,18 @@ function startTimer() {
     // Get path length for animation
     const pathLength = trackPath.getTotalLength();
 
-    timerText.textContent = '60';
+    timerText.textContent = String(totalSeconds);
     timerText.className = 'timer-text';
     trackStatus.textContent = '🟢 GO!';
 
-    // Position car at start
+    // Position car at start line
     updateCarPosition(0, trackPath, f1Car, pathLength);
 
+    // Engine rev at start
+    playSound('engine_start');
+
     const startTime = Date.now();
-    const duration = 60000;
+    let screeched = false;
 
     state.timerInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
@@ -448,24 +476,30 @@ function startTimer() {
         state.timeLeft = remaining;
         timerText.textContent = remaining;
 
-        // Update car position
+        // Update car position with rotation
         updateCarPosition(progress, trackPath, f1Car, pathLength);
 
-        // Color changes
+        // Color and status changes
         if (remaining <= 10) {
             timerText.className = 'timer-text danger';
             trackStatus.textContent = '🔴 HURRY!';
             if (remaining <= 5 && remaining > 0) {
                 playSound('tick');
             }
-        } else if (remaining <= 30) {
+        } else if (remaining <= Math.round(totalSeconds / 2)) {
             timerText.className = 'timer-text warning';
             trackStatus.textContent = '🟡 HALFWAY!';
         }
 
+        // Screech at 3 seconds remaining
+        if (remaining === 3 && !screeched) {
+            screeched = true;
+            playSound('screech');
+        }
+
         if (remaining <= 0) {
             stopTimer();
-            playSound('timeup');
+            playSound('screech');
             trackStatus.textContent = '🏁 TIME!';
             submitAnswer(true);
         }
@@ -473,8 +507,13 @@ function startTimer() {
 }
 
 function updateCarPosition(progress, path, car, pathLength) {
-    const point = path.getPointAtLength(progress * pathLength);
-    car.setAttribute('transform', `translate(${point.x}, ${point.y})`);
+    const dist = progress * pathLength;
+    const pos = path.getPointAtLength(dist);
+    // Compute tangent angle from slightly-ahead point
+    const aheadDist = Math.min(dist + 2, pathLength - 0.1);
+    const ahead = path.getPointAtLength(aheadDist);
+    const angle = Math.atan2(ahead.y - pos.y, ahead.x - pos.x) * 180 / Math.PI;
+    car.setAttribute('transform', `translate(${pos.x}, ${pos.y}) rotate(${angle})`);
 }
 
 function stopTimer() {
@@ -489,6 +528,14 @@ function stopTimer() {
 function calculateScore(target, result) {
     if (result === null) return 0;
     const diff = Math.abs(target - result);
+    if (state.isFinalRound) {
+        if (diff === 0) return 20;
+        if (diff <= 5) return 14;
+        if (diff <= 10) return 10;
+        if (diff <= 20) return 6;
+        if (diff <= 50) return 2;
+        return 0;
+    }
     if (diff === 0) return 10;
     if (diff <= 5) return 7;
     if (diff <= 10) return 5;
@@ -516,18 +563,22 @@ function showResultScreen(result, score, timeExpired) {
     const feedbackEl = document.getElementById('result-feedback');
     const detailsEl = document.getElementById('result-details');
 
+    const maxScore = state.isFinalRound ? 20 : 10;
+    const greatThreshold = state.isFinalRound ? 14 : 7;
+
     let feedbackText, feedbackClass;
-    if (score === 10) {
-        feedbackText = '🌟 PERFECT! 🌟';
+    if (score >= maxScore) {
+        feedbackText = state.isFinalRound ? '🏆 CHAMPION! 🏆' : '🌟 PERFECT! 🌟';
         feedbackClass = 'perfect';
+        launchFireworks();
         launchConfetti();
         playSound('perfect');
-    } else if (score >= 7) {
+    } else if (score >= greatThreshold) {
         feedbackText = '🎉 AMAZING!';
         feedbackClass = 'great';
-        launchConfetti();
+        launchFireworks();
         playSound('great');
-    } else if (score >= 5) {
+    } else if (score >= (state.isFinalRound ? 10 : 5)) {
         feedbackText = '👏 GREAT JOB!';
         feedbackClass = 'great';
         playSound('good');
@@ -734,6 +785,132 @@ function launchConfetti() {
     animate();
 }
 
+// ===== FIREWORKS =====
+function launchFireworks() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const fireworks = [];
+    const colors = ['#ff6b9d', '#45caff', '#ffd93d', '#6bff8e', '#b066ff', '#ff8c42', '#ff4444', '#44ff44'];
+
+    // Launch multiple firework rockets
+    function addRocket() {
+        fireworks.push({
+            type: 'rocket',
+            x: Math.random() * canvas.width * 0.6 + canvas.width * 0.2,
+            y: canvas.height,
+            vy: -(Math.random() * 8 + 10),
+            targetY: Math.random() * canvas.height * 0.4 + canvas.height * 0.1,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            trail: [],
+        });
+    }
+
+    // Stagger rocket launches
+    for (let i = 0; i < 6; i++) {
+        setTimeout(addRocket, i * 400);
+    }
+
+    const sparkles = [];
+    let animFrame;
+    let startTime = Date.now();
+
+    function animate() {
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Update rockets
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+            const fw = fireworks[i];
+            fw.y += fw.vy;
+            fw.trail.push({ x: fw.x, y: fw.y, life: 1 });
+            if (fw.trail.length > 8) fw.trail.shift();
+
+            // Draw trail
+            fw.trail.forEach((t, idx) => {
+                ctx.globalAlpha = t.life * 0.5;
+                ctx.fillStyle = fw.color;
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                t.life -= 0.1;
+            });
+
+            // Draw rocket
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Explode when reaching target
+            if (fw.y <= fw.targetY) {
+                const sparkCount = 60 + Math.floor(Math.random() * 40);
+                for (let s = 0; s < sparkCount; s++) {
+                    const angle = (Math.PI * 2 * s) / sparkCount + (Math.random() - 0.5) * 0.3;
+                    const speed = Math.random() * 6 + 2;
+                    sparkles.push({
+                        x: fw.x,
+                        y: fw.y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: Math.random() > 0.3 ? fw.color : colors[Math.floor(Math.random() * colors.length)],
+                        life: 1,
+                        size: Math.random() * 3 + 1,
+                        gravity: 0.05,
+                    });
+                }
+                fireworks.splice(i, 1);
+                playSound('firework');
+            }
+        }
+
+        // Update sparkles
+        let alive = false;
+        for (let i = sparkles.length - 1; i >= 0; i--) {
+            const s = sparkles[i];
+            s.vy += s.gravity;
+            s.x += s.vx;
+            s.y += s.vy;
+            s.vx *= 0.98;
+            s.life -= 0.015;
+
+            if (s.life <= 0) {
+                sparkles.splice(i, 1);
+                continue;
+            }
+            alive = true;
+
+            ctx.globalAlpha = s.life;
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Sparkle shimmer
+            if (Math.random() > 0.7) {
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size * 0.5 * s.life, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        ctx.globalAlpha = 1;
+
+        if (alive || fireworks.length > 0 || Date.now() - startTime < 3000) {
+            animFrame = requestAnimationFrame(animate);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cancelAnimationFrame(animFrame);
+        }
+    }
+
+    animate();
+}
+
 // ===== SOUND EFFECTS (Web Audio API) =====
 function getAudioCtx() {
     if (!state.audioCtx) {
@@ -832,6 +1009,81 @@ function playSound(type) {
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
+                break;
+            case 'engine_start':
+                // Engine revving up — low sawtooth rising in pitch
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(60, now);
+                osc.frequency.exponentialRampToValueAtTime(280, now + 1.2);
+                osc.frequency.exponentialRampToValueAtTime(180, now + 1.8);
+                gain.gain.setValueAtTime(0.0, now);
+                gain.gain.linearRampToValueAtTime(0.18, now + 0.3);
+                gain.gain.linearRampToValueAtTime(0.12, now + 1.5);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+                osc.start(now);
+                osc.stop(now + 2.2);
+                // Add a second overtone for richness
+                {
+                    const o2 = ctx.createOscillator();
+                    const g2 = ctx.createGain();
+                    o2.connect(g2); g2.connect(ctx.destination);
+                    o2.type = 'sawtooth';
+                    o2.frequency.setValueAtTime(120, now);
+                    o2.frequency.exponentialRampToValueAtTime(560, now + 1.2);
+                    g2.gain.setValueAtTime(0.0, now);
+                    g2.gain.linearRampToValueAtTime(0.07, now + 0.3);
+                    g2.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+                    o2.start(now);
+                    o2.stop(now + 1.8);
+                }
+                break;
+            case 'screech':
+                // Tyre screech — high descending noisy tone
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(2800, now);
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.9);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+                osc.start(now);
+                osc.stop(now + 0.9);
+                {
+                    // Noise layer for grittiness
+                    const bufLen = Math.floor(ctx.sampleRate * 0.9);
+                    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+                    const data = buf.getChannelData(0);
+                    for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = buf;
+                    const ng = ctx.createGain();
+                    noise.connect(ng); ng.connect(ctx.destination);
+                    ng.gain.setValueAtTime(0.12, now);
+                    ng.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+                    noise.start(now);
+                }
+                break;
+            case 'firework':
+                // Whistle up then bang
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(2400, now + 0.25);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+                {
+                    // Explosion bang
+                    const bufLen = Math.floor(ctx.sampleRate * 0.3);
+                    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+                    const data = buf.getChannelData(0);
+                    for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufLen * 0.15));
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = buf;
+                    const ng = ctx.createGain();
+                    noise.connect(ng); ng.connect(ctx.destination);
+                    ng.gain.setValueAtTime(0.35, now + 0.25);
+                    ng.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                    noise.start(now + 0.25);
+                }
                 break;
         }
     } catch (e) {
