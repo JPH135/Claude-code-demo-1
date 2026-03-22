@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech Investment Opportunity Scanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root { --scanner-primary: #0d6efd; --scanner-dark: #1a1d23; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f5f7fa; font-size: 14px; }
+        .navbar { background: var(--scanner-dark) !important; padding: 0.5rem 1rem; }
+        .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; text-align: center; }
+        .stat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--scanner-primary); }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6c757d; margin-top: 0.25rem; }
+        .filter-panel { background: #fff; border: 1px solid #e2e8f0; }
+        .filter-panel .form-label { text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem; }
+        .card { border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .card-header { background: #f8f9fa; border-bottom: 1px solid #e2e8f0; padding: 0.75rem 1rem; }
+        .company-table { font-size: 13px; }
+        .company-table thead th { background: #f8f9fa; border-bottom: 2px solid #dee2e6; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: #495057; padding: 0.75rem 0.5rem; white-space: nowrap; }
+        .company-table tbody td { vertical-align: middle; padding: 0.6rem 0.5rem; }
+        .company-table tbody tr:hover { background-color: #eef2ff !important; }
+        .company-table tbody tr { cursor: pointer; }
+        .company-name { color: var(--scanner-primary); font-weight: 600; text-decoration: none; }
+        .company-name:hover { text-decoration: underline; }
+        .score-high { color: #059669; font-weight: 700; }
+        .score-medium { color: #d97706; font-weight: 700; }
+        .score-low { color: #94a3b8; font-weight: 700; }
+        .stage-badge { font-size: 0.7rem; font-weight: 600; padding: 0.3em 0.6em; }
+        .stage-seed { background: #e2e8f0 !important; color: #475569 !important; }
+        .stage-seriesa, .stage-seriesb { background: #dbeafe !important; color: #1e40af !important; }
+        .stage-seriesc { background: #c084fc !important; color: #fff !important; }
+        .stage-seriesd, .stage-seriese, .stage-seriesg, .stage-seriesh { background: #8b5cf6 !important; color: #fff !important; }
+        .stage-public, .stage-ipo { background: #059669 !important; color: #fff !important; }
+        .stage-acquired, .stage-acquisition { background: #f59e0b !important; color: #fff !important; }
+        .link-icon { color: #94a3b8; font-size: 1rem; margin: 0 0.15rem; transition: color 0.15s; text-decoration: none; }
+        .link-icon:hover { color: var(--scanner-primary); }
+        .sort-btn { cursor: pointer; user-select: none; }
+        .sort-btn:hover { color: var(--scanner-primary); }
+        .sort-btn .bi { font-size: 0.6rem; }
+        /* Detail modal */
+        .detail-stat { text-align: center; padding: 0.75rem; background: #f8f9fa; border-radius: 8px; }
+        .detail-stat .value { font-size: 1.3rem; font-weight: 700; color: var(--scanner-primary); }
+        .detail-stat .label { font-size: 0.7rem; text-transform: uppercase; color: #6c757d; }
+        .score-badge-lg { display: inline-block; width: 64px; text-align: center; border-radius: 8px; padding: 6px 8px; }
+        .score-badge-lg .score-val { font-size: 1.4rem; font-weight: 700; display: block; }
+        .score-badge-lg .score-lbl { font-size: 0.6rem; text-transform: uppercase; }
+        .quality-bg { background: #e8f0fe; color: #1a56db; }
+        .signal-bg { background: #ecfdf5; color: #059669; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-graph-up-arrow me-2 text-primary"></i>
+                <span class="fw-bold">Fintech Scanner</span>
+                <span class="badge bg-primary ms-2 small">BETA</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="container-fluid px-4 py-3">
+        <!-- Stats -->
+        <div class="row g-3 mb-4" id="stats-bar"></div>
+
+        <!-- Filters -->
+        <div class="card filter-panel mb-4">
+            <div class="card-body py-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Category</label>
+                        <select id="filter-category" class="form-select form-select-sm"><option value="">All Categories</option></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">Stage</label>
+                        <select id="filter-stage" class="form-select form-select-sm"><option value="">All Stages</option></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold text-muted">City</label>
+                        <select id="filter-city" class="form-select form-select-sm"><option value="">All Cities</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold text-muted">Search</label>
+                        <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Company name...">
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button id="btn-clear" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x-circle me-1"></i>Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 company-table">
+                    <thead>
+                        <tr>
+                            <th class="sort-btn" data-sort="name">Company <i class="bi bi-chevron-expand"></i></th>
+                            <th class="sort-btn" data-sort="category">Category <i class="bi bi-chevron-expand"></i></th>
+                            <th class="sort-btn" data-sort="stage">Stage <i class="bi bi-chevron-expand"></i></th>
+                            <th class="sort-btn" data-sort="employee_count">Employees <i class="bi bi-chevron-expand"></i></th>
+                            <th class="sort-btn" data-sort="total_raised_usd">Total Raised <i class="bi bi-chevron-expand"></i></th>
+                            <th class="sort-btn" data-sort="last_round">Last Round</th>
+                            <th class="sort-btn" data-sort="quality_score">Score <i class="bi bi-chevron-expand"></i></th>
+                            <th class="sort-btn" data-sort="growth_signal">Signal <i class="bi bi-chevron-expand"></i></th>
+                            <th>Links</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Company Detail Modal -->
+    <div class="modal fade" id="companyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-top mt-4 py-3 text-center text-muted small">
+        Fintech Investment Opportunity Scanner &mdash; For investment research purposes only
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+const COMPANIES = [{"name":"Monzo","description":"Digital-first bank offering current accounts, savings, and financial management tools via mobile app.","website":"https://monzo.com","linkedin_url":"https://www.linkedin.com/company/monzo-bank/","hq_city":"London","hq_country":"UK","category":"Digital Banking","stage":"Series H","founded_year":2015,"total_raised_usd":1200000000,"employee_count":3200,"crunchbase_url":"https://www.crunchbase.com/organization/monzo","funding_rounds":[{"round_type":"Series H","announced_date":"2024-03-01","amount_usd":430000000,"lead_investors":["Capital G"],"all_investors":["Capital G","Silver Lake","GIC"]}]},{"name":"Revolut","description":"Global financial super-app offering banking, crypto, trading, and international payments.","website":"https://revolut.com","linkedin_url":"https://www.linkedin.com/company/revolut/","hq_city":"London","hq_country":"UK","category":"Digital Banking","stage":"Series E","founded_year":2015,"total_raised_usd":1700000000,"employee_count":8000,"crunchbase_url":"https://www.crunchbase.com/organization/revolut","funding_rounds":[{"round_type":"Series E","announced_date":"2023-08-01","amount_usd":800000000,"lead_investors":["SoftBank Vision Fund"],"all_investors":["SoftBank Vision Fund","Tiger Global"]}]},{"name":"Starling Bank","description":"Mobile-first challenger bank providing personal, business, and joint bank accounts in the UK.","website":"https://starlingbank.com","linkedin_url":"https://www.linkedin.com/company/starling-bank/","hq_city":"London","hq_country":"UK","category":"Digital Banking","stage":"Series D","founded_year":2014,"total_raised_usd":750000000,"employee_count":3500,"crunchbase_url":"https://www.crunchbase.com/organization/starling-2","funding_rounds":[{"round_type":"Series D","announced_date":"2022-04-01","amount_usd":130000000,"lead_investors":["Goldman Sachs"],"all_investors":["Goldman Sachs","Fidelity"]}]},{"name":"Checkout.com","description":"Cloud-based payments platform enabling businesses to accept payments online, in-app, and in-person.","website":"https://checkout.com","linkedin_url":"https://www.linkedin.com/company/checkout-com/","hq_city":"London","hq_country":"UK","category":"Payments","stage":"Series D","founded_year":2012,"total_raised_usd":1800000000,"employee_count":1900,"crunchbase_url":"https://www.crunchbase.com/organization/checkout-com","funding_rounds":[{"round_type":"Series D","announced_date":"2022-01-01","amount_usd":1000000000,"lead_investors":["Tiger Global"],"all_investors":["Tiger Global","Insight Partners","GIC"]}]},{"name":"Wise","description":"International money transfer service offering low-cost currency exchange and multi-currency accounts.","website":"https://wise.com","linkedin_url":"https://www.linkedin.com/company/wiseaccount/","hq_city":"London","hq_country":"UK","category":"Payments","stage":"Public","founded_year":2011,"total_raised_usd":1300000000,"employee_count":5500,"crunchbase_url":"https://www.crunchbase.com/organization/transferwise","funding_rounds":[{"round_type":"IPO","announced_date":"2021-07-07","amount_usd":0,"lead_investors":[],"all_investors":[]}]},{"name":"OakNorth","description":"AI-powered lending platform providing bespoke debt finance to fast-growing UK businesses.","website":"https://oaknorth.com","linkedin_url":"https://www.linkedin.com/company/oaknorth/","hq_city":"London","hq_country":"UK","category":"Lending","stage":"Series E","founded_year":2015,"total_raised_usd":1000000000,"employee_count":1100,"crunchbase_url":"https://www.crunchbase.com/organization/oaknorth","funding_rounds":[{"round_type":"Series E","announced_date":"2023-01-15","amount_usd":440000000,"lead_investors":["SoftBank Vision Fund"],"all_investors":["SoftBank Vision Fund","Clermont Group"]}]},{"name":"GoCardless","description":"Global bank payment network for collecting both recurring and one-off payments.","website":"https://gocardless.com","linkedin_url":"https://www.linkedin.com/company/gocardless/","hq_city":"London","hq_country":"UK","category":"Payments","stage":"Series G","founded_year":2011,"total_raised_usd":530000000,"employee_count":900,"crunchbase_url":"https://www.crunchbase.com/organization/gocardless","funding_rounds":[{"round_type":"Series G","announced_date":"2022-02-01","amount_usd":312000000,"lead_investors":["Permira"],"all_investors":["Permira","BlackRock"]}]},{"name":"Zopa","description":"Digital bank and peer-to-peer lending pioneer offering savings accounts, credit cards, and personal loans.","website":"https://zopa.com","linkedin_url":"https://www.linkedin.com/company/zopa/","hq_city":"London","hq_country":"UK","category":"Digital Banking","stage":"Series E","founded_year":2005,"total_raised_usd":780000000,"employee_count":700,"crunchbase_url":"https://www.crunchbase.com/organization/zopa","funding_rounds":[{"round_type":"Series E","announced_date":"2023-06-01","amount_usd":93000000,"lead_investors":["IAG Silverstripe"],"all_investors":["IAG Silverstripe","Davidson Kempner"]}]},{"name":"Thought Machine","description":"Cloud-native core banking technology provider powering next-generation banks worldwide.","website":"https://thoughtmachine.net","linkedin_url":"https://www.linkedin.com/company/thought-machine/","hq_city":"London","hq_country":"UK","category":"Banking Infrastructure","stage":"Series D","founded_year":2014,"total_raised_usd":560000000,"employee_count":800,"crunchbase_url":"https://www.crunchbase.com/organization/thought-machine","funding_rounds":[{"round_type":"Series D","announced_date":"2023-05-01","amount_usd":160000000,"lead_investors":["Temasek"],"all_investors":["Temasek","Intesa Sanpaolo","Morgan Stanley"]}]},{"name":"Funding Circle","description":"SME lending platform connecting small businesses with investors for affordable loans.","website":"https://fundingcircle.com","linkedin_url":"https://www.linkedin.com/company/funding-circle/","hq_city":"London","hq_country":"UK","category":"Lending","stage":"Public","founded_year":2010,"total_raised_usd":750000000,"employee_count":1200,"crunchbase_url":"https://www.crunchbase.com/organization/funding-circle","funding_rounds":[{"round_type":"IPO","announced_date":"2018-10-01","amount_usd":300000000,"lead_investors":[],"all_investors":[]}]},{"name":"ClearBank","description":"UK clearing bank providing real-time clearing and embedded banking services via API.","website":"https://clear.bank","linkedin_url":"https://www.linkedin.com/company/clearbank/","hq_city":"London","hq_country":"UK","category":"Banking Infrastructure","stage":"Series C","founded_year":2015,"total_raised_usd":280000000,"employee_count":500,"crunchbase_url":"https://www.crunchbase.com/organization/clearbank","funding_rounds":[{"round_type":"Series C","announced_date":"2023-09-01","amount_usd":175000000,"lead_investors":["Apax Digital"],"all_investors":["Apax Digital","CFFI"]}]},{"name":"Modulr","description":"Payments-as-a-service platform providing API-driven payment solutions for digital businesses.","website":"https://modulrfinance.com","linkedin_url":"https://www.linkedin.com/company/modulr/","hq_city":"Edinburgh","hq_country":"UK","category":"Payments","stage":"Series C","founded_year":2015,"total_raised_usd":190000000,"employee_count":400,"crunchbase_url":"https://www.crunchbase.com/organization/modulr-finance","funding_rounds":[{"round_type":"Series C","announced_date":"2022-09-01","amount_usd":108000000,"lead_investors":["General Atlantic"],"all_investors":["General Atlantic","PayPal Ventures"]}]},{"name":"TrueLayer","description":"Open banking payments network enabling instant bank payments and financial data access via API.","website":"https://truelayer.com","linkedin_url":"https://www.linkedin.com/company/truelayer/","hq_city":"London","hq_country":"UK","category":"Open Banking","stage":"Series E","founded_year":2016,"total_raised_usd":270000000,"employee_count":500,"crunchbase_url":"https://www.crunchbase.com/organization/truelayer","funding_rounds":[{"round_type":"Series E","announced_date":"2022-09-01","amount_usd":130000000,"lead_investors":["Tiger Global"],"all_investors":["Tiger Global","Stripe","Tencent"]}]},{"name":"Yapily","description":"Open banking infrastructure provider offering API connectivity to banks across Europe.","website":"https://yapily.com","linkedin_url":"https://www.linkedin.com/company/yapily/","hq_city":"London","hq_country":"UK","category":"Open Banking","stage":"Series B","founded_year":2017,"total_raised_usd":69000000,"employee_count":200,"crunchbase_url":"https://www.crunchbase.com/organization/yapily","funding_rounds":[{"round_type":"Series B","announced_date":"2022-03-01","amount_usd":51000000,"lead_investors":["Sapphire Ventures"],"all_investors":["Sapphire Ventures","HV Capital"]}]},{"name":"Currencycloud","description":"B2B cross-border payments platform enabling businesses to process international transactions.","website":"https://currencycloud.com","linkedin_url":"https://www.linkedin.com/company/currencycloud/","hq_city":"London","hq_country":"UK","category":"Payments","stage":"Acquired","founded_year":2012,"total_raised_usd":160000000,"employee_count":350,"crunchbase_url":"https://www.crunchbase.com/organization/currencycloud","funding_rounds":[{"round_type":"Acquisition","announced_date":"2021-11-01","amount_usd":963000000,"lead_investors":["Visa"],"all_investors":["Visa"]}]},{"name":"Flagstone","description":"Cash deposit platform helping individuals and businesses access better savings rates across multiple banks.","website":"https://flagstoneim.com","linkedin_url":"https://www.linkedin.com/company/flagstone-group/","hq_city":"London","hq_country":"UK","category":"Wealth Management","stage":"Series B","founded_year":2013,"total_raised_usd":45000000,"employee_count":150,"crunchbase_url":"https://www.crunchbase.com/organization/flagstone-im","funding_rounds":[{"round_type":"Series B","announced_date":"2022-06-01","amount_usd":28000000,"lead_investors":["Motive Partners"],"all_investors":["Motive Partners"]}]},{"name":"Paddle","description":"Revenue delivery platform handling payments, tax, and subscriptions for SaaS companies.","website":"https://paddle.com","linkedin_url":"https://www.linkedin.com/company/paddle-com/","hq_city":"London","hq_country":"UK","category":"Payments","stage":"Series D","founded_year":2012,"total_raised_usd":293000000,"employee_count":350,"crunchbase_url":"https://www.crunchbase.com/organization/paddle-com","funding_rounds":[{"round_type":"Series D","announced_date":"2022-05-01","amount_usd":200000000,"lead_investors":["KKR"],"all_investors":["KKR","FTV Capital","83North"]}]},{"name":"Featurespace","description":"Enterprise AI fraud and financial crime prevention using adaptive behavioral analytics.","website":"https://featurespace.com","linkedin_url":"https://www.linkedin.com/company/featurespace/","hq_city":"Cambridge","hq_country":"UK","category":"RegTech","stage":"Series C","founded_year":2008,"total_raised_usd":108000000,"employee_count":500,"crunchbase_url":"https://www.crunchbase.com/organization/featurespace","funding_rounds":[{"round_type":"Series C","announced_date":"2021-03-01","amount_usd":37000000,"lead_investors":["MissionOG"],"all_investors":["MissionOG","IP Group"]}]},{"name":"Eigen Technologies","description":"Natural language processing platform for extracting and analysing data from complex financial documents.","website":"https://eigentech.com","linkedin_url":"https://www.linkedin.com/company/eigen-technologies/","hq_city":"London","hq_country":"UK","category":"RegTech","stage":"Series B","founded_year":2014,"total_raised_usd":73000000,"employee_count":200,"crunchbase_url":"https://www.crunchbase.com/organization/eigen-technologies","funding_rounds":[{"round_type":"Series B","announced_date":"2021-06-01","amount_usd":55000000,"lead_investors":["Dawn Capital"],"all_investors":["Dawn Capital","Goldman Sachs","Lakestar"]}]},{"name":"Tractable","description":"AI-powered visual assessment platform for accident and disaster recovery in insurance.","website":"https://tractable.ai","linkedin_url":"https://www.linkedin.com/company/tractable/","hq_city":"London","hq_country":"UK","category":"InsurTech","stage":"Series E","founded_year":2014,"total_raised_usd":115000000,"employee_count":350,"crunchbase_url":"https://www.crunchbase.com/organization/tractable","funding_rounds":[{"round_type":"Series E","announced_date":"2023-03-01","amount_usd":65000000,"lead_investors":["SoftBank Vision Fund"],"all_investors":["SoftBank Vision Fund","Georgian Partners","Insight Partners"]}}];
+
+// Add computed scores to each company
+COMPANIES.forEach(c => {
+    // Quality score based on funding, employees, age
+    let qs = 0;
+    if (c.total_raised_usd > 1000000000) qs += 35;
+    else if (c.total_raised_usd > 500000000) qs += 28;
+    else if (c.total_raised_usd > 100000000) qs += 20;
+    else qs += 10;
+    if (c.employee_count > 1000) qs += 25;
+    else if (c.employee_count > 500) qs += 20;
+    else if (c.employee_count > 200) qs += 15;
+    else qs += 8;
+    const age = 2026 - c.founded_year;
+    if (age <= 5) qs += 20;
+    else if (age <= 10) qs += 15;
+    else qs += 10;
+    if (c.funding_rounds.length > 0 && c.funding_rounds[0].lead_investors.length > 0) qs += 15;
+    c.quality_score = Math.min(qs, 100);
+
+    // Growth signal based on recent funding and employee count
+    let gs = 0;
+    if (c.funding_rounds.length > 0) {
+        const lastDate = new Date(c.funding_rounds[0].announced_date);
+        const monthsAgo = (new Date(2026, 2, 22) - lastDate) / (1000*60*60*24*30);
+        if (monthsAgo < 12) gs += 40;
+        else if (monthsAgo < 24) gs += 30;
+        else if (monthsAgo < 36) gs += 20;
+        else gs += 10;
+        if (c.funding_rounds[0].amount_usd > 200000000) gs += 25;
+        else if (c.funding_rounds[0].amount_usd > 50000000) gs += 18;
+        else gs += 10;
+    }
+    if (c.employee_count > 1000) gs += 20;
+    else if (c.employee_count > 300) gs += 15;
+    else gs += 8;
+    c.growth_signal = Math.min(gs, 100);
+});
+
+function formatMoney(usd) {
+    if (!usd || usd === 0) return '-';
+    if (usd >= 1e9) return '$' + (usd / 1e9).toFixed(1) + 'B';
+    if (usd >= 1e6) return '$' + (usd / 1e6).toFixed(0) + 'M';
+    return '$' + usd.toLocaleString();
+}
+
+function escapeHtml(t) {
+    if (!t) return '';
+    const d = document.createElement('div'); d.textContent = t; return d.innerHTML;
+}
+
+function stageClass(stage) {
+    if (!stage) return '';
+    return 'stage-' + stage.toLowerCase().replace(/\s+/g, '');
+}
+
+function scoreClass(val) {
+    if (val >= 60) return 'score-high';
+    if (val >= 30) return 'score-medium';
+    return 'score-low';
+}
+
+// Populate filters
+function populateFilters() {
+    const cats = [...new Set(COMPANIES.map(c => c.category))].sort();
+    const stages = [...new Set(COMPANIES.map(c => c.stage))].sort();
+    const cities = [...new Set(COMPANIES.map(c => c.hq_city))].sort();
+    cats.forEach(v => document.getElementById('filter-category').innerHTML += `<option value="${v}">${v}</option>`);
+    stages.forEach(v => document.getElementById('filter-stage').innerHTML += `<option value="${v}">${v}</option>`);
+    cities.forEach(v => document.getElementById('filter-city').innerHTML += `<option value="${v}">${v}</option>`);
+}
+
+// Stats bar
+function renderStats(companies) {
+    const totalRaised = companies.reduce((s, c) => s + (c.total_raised_usd || 0), 0);
+    const cats = new Set(companies.map(c => c.category));
+    const cities = new Set(companies.map(c => c.hq_city));
+    const avgScore = companies.length ? Math.round(companies.reduce((s, c) => s + c.quality_score, 0) / companies.length) : 0;
+    document.getElementById('stats-bar').innerHTML = `
+        <div class="col-md-2"><div class="stat-card"><div class="stat-value">${companies.length}</div><div class="stat-label">Companies</div></div></div>
+        <div class="col-md-2"><div class="stat-card"><div class="stat-value">${formatMoney(totalRaised)}</div><div class="stat-label">Total Raised</div></div></div>
+        <div class="col-md-2"><div class="stat-card"><div class="stat-value">${cats.size}</div><div class="stat-label">Categories</div></div></div>
+        <div class="col-md-2"><div class="stat-card"><div class="stat-value">${cities.size}</div><div class="stat-label">Cities</div></div></div>
+        <div class="col-md-2"><div class="stat-card"><div class="stat-value">${avgScore}</div><div class="stat-label">Avg Score</div></div></div>
+        <div class="col-md-2"><div class="stat-card"><div class="stat-value">${companies.reduce((s,c) => s + c.employee_count, 0).toLocaleString()}</div><div class="stat-label">Total Employees</div></div></div>
+    `;
+}
+
+// Sort state
+let sortCol = 'quality_score', sortDir = -1;
+
+function getFiltered() {
+    const cat = document.getElementById('filter-category').value;
+    const stage = document.getElementById('filter-stage').value;
+    const city = document.getElementById('filter-city').value;
+    const search = document.getElementById('filter-search').value.toLowerCase();
+    return COMPANIES.filter(c => {
+        if (cat && c.category !== cat) return false;
+        if (stage && c.stage !== stage) return false;
+        if (city && c.hq_city !== city) return false;
+        if (search && !c.name.toLowerCase().includes(search)) return false;
+        return true;
+    });
+}
+
+function getSorted(list) {
+    return [...list].sort((a, b) => {
+        let va = a[sortCol], vb = b[sortCol];
+        if (sortCol === 'last_round') {
+            va = a.funding_rounds.length ? new Date(a.funding_rounds[0].announced_date).getTime() : 0;
+            vb = b.funding_rounds.length ? new Date(b.funding_rounds[0].announced_date).getTime() : 0;
+        }
+        if (typeof va === 'string') va = va.toLowerCase();
+        if (typeof vb === 'string') vb = vb.toLowerCase();
+        if (va < vb) return -1 * sortDir;
+        if (va > vb) return 1 * sortDir;
+        return 0;
+    });
+}
+
+function renderTable() {
+    const filtered = getFiltered();
+    const sorted = getSorted(filtered);
+    renderStats(filtered);
+
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = sorted.map((c, i) => {
+        const lastRound = c.funding_rounds.length ? c.funding_rounds[0] : null;
+        const lastRoundStr = lastRound ? `${lastRound.round_type} - ${formatMoney(lastRound.amount_usd)}<br><small class="text-muted">${new Date(lastRound.announced_date).toLocaleDateString('en-GB', {month:'short', year:'numeric'})}</small>` : '-';
+        return `<tr data-idx="${i}" onclick="showDetail(${COMPANIES.indexOf(c)})">
+            <td><span class="company-name">${escapeHtml(c.name)}</span><br><small class="text-muted">${escapeHtml(c.hq_city)}</small></td>
+            <td><span class="badge bg-light text-dark">${escapeHtml(c.category)}</span></td>
+            <td><span class="badge stage-badge ${stageClass(c.stage)}">${escapeHtml(c.stage)}</span></td>
+            <td>${c.employee_count ? c.employee_count.toLocaleString() : '-'}</td>
+            <td><strong>${formatMoney(c.total_raised_usd)}</strong></td>
+            <td>${lastRoundStr}</td>
+            <td class="text-center"><span class="${scoreClass(c.quality_score)}">${c.quality_score}</span></td>
+            <td class="text-center"><span class="${scoreClass(c.growth_signal)}">${c.growth_signal}</span></td>
+            <td>
+                ${c.website ? `<a href="${escapeHtml(c.website)}" target="_blank" class="link-icon" title="Website" onclick="event.stopPropagation()"><i class="bi bi-globe"></i></a>` : ''}
+                ${c.linkedin_url ? `<a href="${escapeHtml(c.linkedin_url)}" target="_blank" class="link-icon" title="LinkedIn" onclick="event.stopPropagation()"><i class="bi bi-linkedin"></i></a>` : ''}
+                ${c.crunchbase_url ? `<a href="${escapeHtml(c.crunchbase_url)}" target="_blank" class="link-icon" title="Crunchbase" onclick="event.stopPropagation()"><i class="bi bi-box-arrow-up-right"></i></a>` : ''}
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function showDetail(idx) {
+    const c = COMPANIES[idx];
+    document.getElementById('modal-title').innerHTML = `${escapeHtml(c.name)} <span class="badge stage-badge ${stageClass(c.stage)} ms-2">${escapeHtml(c.stage)}</span>`;
+
+    const lastRound = c.funding_rounds.length ? c.funding_rounds[0] : null;
+    const investors = lastRound ? lastRound.all_investors : [];
+    const leadInvestors = lastRound ? lastRound.lead_investors : [];
+
+    document.getElementById('modal-body').innerHTML = `
+        <p class="text-muted"><i class="bi bi-geo-alt me-1"></i>${escapeHtml(c.hq_city)}, ${escapeHtml(c.hq_country)}
+        <span class="mx-2">|</span><i class="bi bi-tag me-1"></i>${escapeHtml(c.category)}
+        <span class="mx-2">|</span><i class="bi bi-calendar me-1"></i>Founded ${c.founded_year}</p>
+        <p>${escapeHtml(c.description)}</p>
+
+        <div class="d-flex gap-2 mb-4">
+            <div class="score-badge-lg quality-bg"><span class="score-val">${c.quality_score}</span><span class="score-lbl">Quality</span></div>
+            <div class="score-badge-lg signal-bg"><span class="score-val">${c.growth_signal}</span><span class="score-lbl">Signal</span></div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-3"><div class="detail-stat"><div class="value">${formatMoney(c.total_raised_usd)}</div><div class="label">Total Raised</div></div></div>
+            <div class="col-3"><div class="detail-stat"><div class="value">${c.employee_count ? c.employee_count.toLocaleString() : 'N/A'}</div><div class="label">Employees</div></div></div>
+            <div class="col-3"><div class="detail-stat"><div class="value">${lastRound ? lastRound.round_type : 'N/A'}</div><div class="label">Last Round</div></div></div>
+            <div class="col-3"><div class="detail-stat"><div class="value">${lastRound ? formatMoney(lastRound.amount_usd) : '-'}</div><div class="label">Last Amount</div></div></div>
+        </div>
+
+        ${investors.length ? `
+        <h6><i class="bi bi-bank me-2"></i>Investors</h6>
+        <div class="mb-2">
+            ${leadInvestors.map(i => `<span class="badge bg-primary me-1 mb-1">${escapeHtml(i)}</span>`).join('')}
+            ${investors.filter(i => !leadInvestors.includes(i)).map(i => `<span class="badge bg-light text-dark me-1 mb-1">${escapeHtml(i)}</span>`).join('')}
+        </div>` : ''}
+
+        <div class="d-flex gap-2 mt-3">
+            ${c.website ? `<a href="${escapeHtml(c.website)}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-globe me-1"></i>Website</a>` : ''}
+            ${c.linkedin_url ? `<a href="${escapeHtml(c.linkedin_url)}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-linkedin me-1"></i>LinkedIn</a>` : ''}
+            ${c.crunchbase_url ? `<a href="${escapeHtml(c.crunchbase_url)}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-up-right me-1"></i>Crunchbase</a>` : ''}
+        </div>
+    `;
+    new bootstrap.Modal(document.getElementById('companyModal')).show();
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+    populateFilters();
+    renderTable();
+
+    // Filters
+    document.getElementById('filter-category').addEventListener('change', renderTable);
+    document.getElementById('filter-stage').addEventListener('change', renderTable);
+    document.getElementById('filter-city').addEventListener('change', renderTable);
+    document.getElementById('filter-search').addEventListener('input', renderTable);
+    document.getElementById('btn-clear').addEventListener('click', () => {
+        document.getElementById('filter-category').value = '';
+        document.getElementById('filter-stage').value = '';
+        document.getElementById('filter-city').value = '';
+        document.getElementById('filter-search').value = '';
+        renderTable();
+    });
+
+    // Sort
+    document.querySelectorAll('.sort-btn').forEach(th => {
+        th.addEventListener('click', () => {
+            const col = th.dataset.sort;
+            if (sortCol === col) sortDir *= -1;
+            else { sortCol = col; sortDir = col === 'name' ? 1 : -1; }
+            renderTable();
+        });
+    });
+});
+    </script>
+</body>
+</html>
