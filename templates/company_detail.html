@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="/">Market Map</a></li>
+        <li class="breadcrumb-item active">{{ company.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Left Column: Company Overview -->
+    <div class="col-lg-8">
+        <!-- Header -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h2 class="mb-1">
+                            {{ company.name }}
+                            {% if company.stage %}
+                            <span class="badge stage-badge-{{ company.stage | lower | replace(' ', '') }} ms-2">{{ company.stage }}</span>
+                            {% endif %}
+                        </h2>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-geo-alt me-1"></i>{{ company.hq_city }}{% if company.hq_city and company.hq_country %}, {% endif %}{{ company.hq_country }}
+                            {% if company.category %}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-tag me-1"></i>{{ company.category }}
+                            {% endif %}
+                            {% if company.founded_year %}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-calendar me-1"></i>Founded {{ company.founded_year }}
+                            {% endif %}
+                        </p>
+                        <p class="mb-0">{{ company.description }}</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="score-badge quality-score mb-2" title="Quality Score">
+                            <span class="score-value">{{ company.quality_score | round(0) | int }}</span>
+                            <span class="score-label">Quality</span>
+                        </div>
+                        <div class="score-badge growth-signal" title="Growth Signal">
+                            <span class="score-value">{{ company.growth_signal | round(0) | int }}</span>
+                            <span class="score-label">Signal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick links -->
+                <div class="mt-3 d-flex gap-2">
+                    {% if company.website %}
+                    <a href="{{ company.website }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-globe me-1"></i>Website
+                    </a>
+                    {% endif %}
+                    {% if company.linkedin_url %}
+                    <a href="{{ company.linkedin_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-linkedin me-1"></i>LinkedIn
+                    </a>
+                    {% endif %}
+                    {% if company.crunchbase_url %}
+                    <a href="{{ company.crunchbase_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Crunchbase
+                    </a>
+                    {% endif %}
+                    {% if company.companies_house_id %}
+                    <a href="https://find-and-update.company-information.service.gov.uk/company/{{ company.companies_house_id }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-building me-1"></i>Companies House
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">{{ company.total_raised_display }}</div>
+                    <div class="stat-label">Total Raised</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">{{ company.employee_count or 'N/A' }}</div>
+                    <div class="stat-label">
+                        Employees
+                        {% if company.employee_growth_6m %}
+                        <span class="{% if company.employee_growth_6m > 0 %}text-success{% else %}text-danger{% endif %}">
+                            ({% if company.employee_growth_6m > 0 %}+{% endif %}{{ company.employee_growth_6m }}%)
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">{{ company.last_round_display }}</div>
+                    <div class="stat-label">Last Round</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value small">{{ company.next_raise_estimate or 'Unknown' }}</div>
+                    <div class="stat-label">
+                        Next Raise
+                        {% if company.next_raise_confidence %}
+                        <span class="badge bg-{% if company.next_raise_confidence == 'High' %}success{% elif company.next_raise_confidence == 'Medium' %}warning{% else %}secondary{% endif %} ms-1">
+                            {{ company.next_raise_confidence }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funding Timeline Chart -->
+        {% if chart_data.labels %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Funding History</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="fundingChart" height="200"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Funding Rounds Table -->
+        {% if company.funding_rounds %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Funding Rounds</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Amount</th>
+                            <th>Lead Investor(s)</th>
+                            <th>All Investors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for round in company.funding_rounds %}
+                        <tr>
+                            <td>{{ round.announced_date.strftime('%b %Y') if round.announced_date else 'Unknown' }}</td>
+                            <td><span class="badge bg-secondary">{{ round.round_type }}</span></td>
+                            <td class="fw-semibold">{{ round.amount_display }}</td>
+                            <td>{{ round.lead_investors | join(', ') }}</td>
+                            <td class="small text-muted">{{ round.all_investors | join(', ') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Employee Trend Chart -->
+        {% if emp_chart.labels %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-people me-2"></i>Employee Count Trend</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="employeeChart" height="200"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent News -->
+        {% if company.news_articles %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-newspaper me-2"></i>Recent News</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for article in company.news_articles[:15] %}
+                <a href="{{ article.url }}" target="_blank" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">{{ article.title }}</h6>
+                            <p class="mb-1 small text-muted">{{ article.snippet[:200] }}</p>
+                        </div>
+                        <div class="text-end text-nowrap ms-3">
+                            <small class="text-muted">{{ article.published_date.strftime('%d %b %Y') if article.published_date else '' }}</small>
+                            <br>
+                            <span class="badge bg-light text-dark">{{ article.source_name }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Sidebar -->
+    <div class="col-lg-4">
+        <!-- Next Raise Prediction -->
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Fundraise Prediction</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h4 class="mb-1">{{ company.next_raise_estimate or 'Unknown' }}</h4>
+                    {% if company.next_raise_confidence %}
+                    <span class="badge bg-{% if company.next_raise_confidence == 'High' %}success{% elif company.next_raise_confidence == 'Medium' %}warning{% else %}secondary{% endif %}">
+                        {{ company.next_raise_confidence }} confidence
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="small text-muted mb-0">{{ raise_context }}</p>
+                {% if company.last_round_date %}
+                <hr>
+                <div class="small">
+                    <strong>Last raised:</strong> {{ company.last_round_date.strftime('%B %Y') }}
+                    ({{ ((company.last_round_date | string | replace('-','') | int - 20260322) / 30) | abs | round(0) | int }} months ago approx.)
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Investors -->
+        {% if all_investors %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-bank me-2"></i>Investors</h6>
+            </div>
+            <div class="card-body">
+                {% if lead_investors %}
+                <div class="mb-3">
+                    <small class="fw-semibold text-muted d-block mb-2">LEAD INVESTORS</small>
+                    {% for inv in lead_investors %}
+                    <span class="badge bg-primary me-1 mb-1">{{ inv }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div>
+                    <small class="fw-semibold text-muted d-block mb-2">ALL INVESTORS</small>
+                    {% for inv in all_investors %}
+                    <span class="badge bg-light text-dark me-1 mb-1">{{ inv }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Company Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Details</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr><td class="text-muted">Founded</td><td>{{ company.founded_year or 'N/A' }}</td></tr>
+                    <tr><td class="text-muted">HQ</td><td>{{ company.hq_city }}, {{ company.hq_country }}</td></tr>
+                    <tr><td class="text-muted">Category</td><td>{{ company.category }}</td></tr>
+                    <tr><td class="text-muted">Stage</td><td>{{ company.stage }}</td></tr>
+                    <tr><td class="text-muted">Employees</td><td>{{ company.employee_count or 'N/A' }}</td></tr>
+                    {% if company.revenue_estimate_usd %}
+                    <tr><td class="text-muted">Revenue Est.</td><td>${{ (company.revenue_estimate_usd / 1000000) | round(1) }}M</td></tr>
+                    {% endif %}
+                    {% if company.companies_house_id %}
+                    <tr><td class="text-muted">CH #</td><td>{{ company.companies_house_id }}</td></tr>
+                    {% endif %}
+                    <tr><td class="text-muted">Last Updated</td><td>{{ company.updated_at.strftime('%d %b %Y') if company.updated_at else 'N/A' }}</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        {% if company.key_metrics %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-speedometer me-2"></i>Key Metrics</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    {% for key, value in company.key_metrics.items() %}
+                    <tr><td class="text-muted">{{ key }}</td><td>{{ value }}</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if chart_data.labels %}
+    // Funding chart
+    const fundingCtx = document.getElementById('fundingChart').getContext('2d');
+    new Chart(fundingCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.labels | tojson }},
+            datasets: [{
+                label: 'Amount Raised ($M)',
+                data: {{ chart_data.amounts | tojson }},
+                backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const types = {{ chart_data.types | tojson }};
+                            return types[ctx.dataIndex] + ': $' + ctx.parsed.y.toFixed(1) + 'M';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Amount ($M)' }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    {% if emp_chart.labels %}
+    // Employee trend chart
+    const empCtx = document.getElementById('employeeChart').getContext('2d');
+    new Chart(empCtx, {
+        type: 'line',
+        data: {
+            labels: {{ emp_chart.labels | tojson }},
+            datasets: [{
+                label: 'Employees',
+                data: {{ emp_chart.counts | tojson }},
+                borderColor: 'rgba(25, 135, 84, 1)',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Headcount' }
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

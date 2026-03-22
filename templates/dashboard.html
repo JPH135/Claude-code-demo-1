@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Market Map{% endblock %}
+
+{% block content %}
+<!-- Stats Bar -->
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_companies }}</div>
+            <div class="stat-label">Companies Tracked</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_countries }}</div>
+            <div class="stat-label">Countries</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_raised_display }}</div>
+            <div class="stat-label">Total Raised</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value {% if stats.new_this_week > 0 %}text-success{% endif %}">
+                {{ stats.new_this_week }}
+            </div>
+            <div class="stat-label">New This Week</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.categories | length }}</div>
+            <div class="stat-label">Categories</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stat-card">
+            <div class="stat-value small">{{ stats.last_scan }}</div>
+            <div class="stat-label">Last Scan</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card filter-panel mb-4">
+    <div class="card-body py-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Category</label>
+                <select id="filter-category" class="form-select form-select-sm">
+                    <option value="">All Categories</option>
+                    {% for cat in stats.categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Country</label>
+                <select id="filter-country" class="form-select form-select-sm">
+                    <option value="">All Countries</option>
+                    {% for country in stats.countries %}
+                    <option value="{{ country }}">{{ country }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Stage</label>
+                <select id="filter-stage" class="form-select form-select-sm">
+                    <option value="">All Stages</option>
+                    {% for stage in stats.stages %}
+                    <option value="{{ stage }}">{{ stage }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Search</label>
+                <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Company name...">
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" id="filter-new-only">
+                    <label class="form-check-label small" for="filter-new-only">New this week only</label>
+                </div>
+            </div>
+            <div class="col-md-2 text-end">
+                <button id="btn-clear-filters" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle me-1"></i>Clear Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Company Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <table id="companies-table" class="table table-hover table-striped mb-0" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Country</th>
+                    <th>Category</th>
+                    <th>Stage</th>
+                    <th>Employees</th>
+                    <th>Total Raised</th>
+                    <th>Last Round</th>
+                    <th>Next Raise Est.</th>
+                    <th class="text-center">Score</th>
+                    <th class="text-center">Signal</th>
+                    <th>Links</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initDashboard();
+});
+</script>
+{% endblock %}
